@@ -10,7 +10,7 @@ The Switch for mode selection:
 switch:
   - platform: mqtt
     name: "Klingel Modus"
-	unique_id: klingel_mode
+    unique_id: klingel_mode
     state_topic: "/home/haustuer/klingel/status"
     command_topic: "/home/haustuer/klingel/mode"
     payload_on: "1"
@@ -29,7 +29,7 @@ sensor:
 
   - platform: mqtt
     name: "Klingel Status"
-	unique_id: klingel_status
+    unique_id: klingel_status
     state_topic: "/home/haustuer/klingel/status"
 ```
 
