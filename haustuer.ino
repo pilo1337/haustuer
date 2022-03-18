@@ -135,34 +135,36 @@ void setup() {
 
   if (SPIFFS.begin()) {
     Serial.println("mounted file system");
-    if (SPIFFS.exists("/config.json")) {
-      //file exists, reading and loading
+    if (SPIFFS.exists("/config.json"))
+    {
       Serial.println("reading config file");
       File configFile = SPIFFS.open("/config.json", "r");
-      if (configFile) {
+      if (configFile)
+      {
         Serial.println("opened config file");
         size_t size = configFile.size();
-        // Allocate a buffer to store contents of the file.
         std::unique_ptr<char[]> buf(new char[size]);
-
         configFile.readBytes(buf.get(), size);
-
-#ifdef ARDUINOJSON_VERSION_MAJOR >= 6
+        
+      #ifdef ARDUINOJSON_VERSION_MAJOR >= 6
         DynamicJsonDocument json(1024);
         auto deserializeError = deserializeJson(json, buf.get());
         serializeJson(json, Serial);
-        if ( ! deserializeError ) {
-#else
-        DynamicJsonBuffer jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        json.printTo(Serial);
-        if (json.success()) {
-#endif
-          Serial.println("\nparsed json");
-          strcpy(MQTT_BROKER, json["mqtt_server"]);
-          strcpy(MQTT_PORT, json["mqtt_port"]);
-        } else {
-          Serial.println("failed to load json config");
+        if ( ! deserializeError )
+        {
+      #else
+          DynamicJsonBuffer jsonBuffer;
+          JsonObject& json = jsonBuffer.parseObject(buf.get());
+          json.printTo(Serial);
+          if (json.success())
+          {
+      #endif
+            Serial.println("\nparsed json");
+            strcpy(MQTT_BROKER, json["mqtt_server"]);
+            strcpy(MQTT_PORT, json["mqtt_port"]);
+          } else
+          {
+            Serial.println("failed to load json config");
         }
         configFile.close();
       }
@@ -185,31 +187,32 @@ void setup() {
   strcpy(MQTT_PORT, custom_mqtt_port.getValue());
 
   //save the custom parameters to FS
-  if (shouldSaveConfig) {
+  if (shouldSaveConfig)
+  {
     Serial.println("saving config");
-#ifdef ARDUINOJSON_VERSION_MAJOR >= 6
+  #ifdef ARDUINOJSON_VERSION_MAJOR >= 6
     DynamicJsonDocument json(1024);
-#else
+  #else
     DynamicJsonBuffer jsonBuffer;
     JsonObject& json = jsonBuffer.createObject();
-#endif
+  #endif
     json["mqtt_server"] = MQTT_BROKER;
     json["mqtt_port"] = MQTT_PORT;
 
     File configFile = SPIFFS.open("/config.json", "w");
-    if (!configFile) {
+    if (!configFile)
+    {
       Serial.println("failed to open config file for writing");
     }
 
-#ifdef ARDUINOJSON_VERSION_MAJOR >= 6
+  #ifdef ARDUINOJSON_VERSION_MAJOR >= 6
     serializeJson(json, Serial);
     serializeJson(json, configFile);
-#else
+  #else
     json.printTo(Serial);
     json.printTo(configFile);
-#endif
+  #endif
     configFile.close();
-    //end save
   }
 
   Serial.println("local ip");
