@@ -20,8 +20,9 @@ extern "C"
  * Variables
  */
 os_timer_t Timer1;         
-int Counter = 0;           
-bool TickOccured = false;
+int Counter = 0;
+           
+bool TickOccured = true;
 
 bool doorbellTriggered = false;
 
@@ -87,12 +88,15 @@ void callback(char* topic, byte* payload, unsigned int length) {
     digitalWrite(modePin,HIGH);
     Serial.println("switch to HA");  
     EEPROM.write(0, 1);
+    TickOccured = true;
+    
   }
   else if (strcmp(topic,modeTopic) == 0 && (char)payload[0] == '0')
   {
     digitalWrite(modePin,LOW);
     Serial.println("Switch to doorbell");
     EEPROM.write(0, 0);
+    TickOccured = true;
   
   }
   else if (strcmp(topic,doorOpenerTopic) == 0 && (char)payload[0] == '1')
@@ -265,7 +269,9 @@ void loop()
   if (doorbellTriggered)
   {
     Serial.println("hat geklingelt");
-    client.publish(doorbellTopic, "triggered");
+    client.publish(doorbellTopic, "DingDong");
+    delay(2000);
+    client.publish(doorbellTopic, " ");    
     doorbellTriggered = false;
   }
 
